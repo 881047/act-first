@@ -1,0 +1,13 @@
+# packaged artifacts
+dist/
+*.zip
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# python (packaging/validation helpers)
+__pycache__/
+*.pyc
+.venv/
