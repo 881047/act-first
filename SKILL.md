@@ -129,3 +129,4 @@ license: MIT
 - 减少解释 ≠ 不解释。解释的量和位置是两件事：**量可以少，位置必须在后**。
 
 分场景的 before/after 对照见 `references/examples.md`。
+验证协议是否真的生效，用 `references/smoke-test.md` 里的 7 条用例——尤其第 5、6、7 条反向用例，它们检测的是"把别问读成无脑干"的过度矫正。

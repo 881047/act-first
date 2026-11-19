@@ -133,7 +133,8 @@ You can compress the rules into two or three lines of system prompt, but you'll 
 act-first/
 ├── SKILL.md                  # the protocol: rules, banned phrases, boundaries, self-check
 ├── references/
-│   └── examples.md           # 8 before/after pairs by task type
+│   ├── examples.md           # 8 before/after pairs by task type
+│   └── smoke-test.md         # 7 acceptance cases (3 of them in reverse)
 ├── README.md                 # 中文
 ├── README.en.md              # this file
 └── LICENSE                   # MIT
@@ -142,6 +143,39 @@ act-first/
 `references/examples.md` covers: building a page, writing a weekly report, diagnosing dirty data, fixing a `KeyError`, cleaning a downloads folder, product research, the vague "optimize this", and one **counter-example** — an outbound email that correctly stops.
 
 Behavior skills live or die on examples, not rules. That file is core, not appendix.
+
+---
+
+## Verifying that it actually works
+
+The standard failure of behavior skills is **unfalsifiability**: it feels slightly better, but you can't say why or whether it fired at all.
+
+`references/smoke-test.md` provides 7 cases. Run each in a fresh session, check the pass criteria, and search the reply for the failure signals. The first 4 test "did it do the work"; the last 3 test the **opposite**:
+
+- Asked "should we migrate our logging stack?", it should give a judgment — and **not** create a migration doc
+- Asked to email clients, it should stop, and stop *reviewably* (a recipient list, not "shall I send?")
+- Told "don't touch anything yet", it must produce a plan only
+
+**Failing the last 3 is worse than failing the first 4.** Failing the first 4 means no help was delivered. Failing the last 3 means harm was: reading "stop asking" as "act blindly" — and that damage usually isn't reversible. It's also the fastest way to tell whether an action-bias skill has overcorrected.
+
+---
+
+## Making it always-on (optional)
+
+Skills load only when their description matches. To make it apply to **every** session, add this to your runtime's long-term memory or system prompt:
+
+```
+For execution-type requests, carry the work through to a deliverable and
+report results and assumptions afterwards — never end a turn with a proposal,
+"want me to do X?", or "shall I continue?". The test is reversibility, not
+task size: reversible and non-public → pick the sensible default and log the
+assumption; irreversible or outbound → confirm first, with specifics.
+If the user says "don't act yet" or "just the plan" → switch to advisory mode.
+```
+
+Three lines is enough. Don't paste the whole `SKILL.md` — shorter rules survive long context better, and the detail stays available via the skill on demand.
+
+A per-turn injected hook is not recommended: token cost accumulates per turn, and it overrides the perfectly natural intent to just ask a question.
 
 ---
 
@@ -156,7 +190,7 @@ One thing neither source covers well, added here: models **declare completion to
 
 ## Known limits
 
-- **Loads only when the description matches.** That's the skill mechanism, not a config gap. Making it always-on requires a runtime-level hook or a permanent system prompt.
+- **Loads only when the description matches.** That's the skill mechanism, not a config gap. See "Making it always-on" above for the three-line addition.
 - **It should not fire on question-type requests.** Asked "should I use A?", the answer is a judgment, not code. The intent table separates these, but the boundary stays fuzzy; mixed intent resolves to "do what's doable, keep the genuinely human call as one question placed after the result."
 - **The protocol text is Chinese.** The design is language-agnostic, and this README covers it fully in English. An English `SKILL.md` is welcome as a PR.
 - **Not a panacea.** It suppresses "should have just done it but asked instead." Real ambiguity still deserves a question — just phrased as one question plus a proposed default.
